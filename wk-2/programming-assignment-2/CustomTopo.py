@@ -20,7 +20,23 @@ class CustomTopo(Topo):
         
         # Add your logic here ...
 
+# need testing code here
+def simpleTest():
+	# create and test simple network
+	# bw is in mps, delay is in ms or us, loss is in percentag, 
+	linkopts1 = {'bw': 30, 'delay': '20ms'}
+	linkopts2 = {'bw': 20, 'delay': '10ms'}
+	linkopts3 = {'bw': 10, 'delay': '10ms'}
+	fanout = 2
+	
+	topo = CustomTopo(self, linkopts1, linkopts2, linkopts3, fanout=2, **opts)
 
+
+# need this code for running local
+if __name__ == 'main':
+	# tell mininet to print useful information
+	setLogLevel('info')
+	simpleTest()
         
-                    
-topos = { 'custom': ( lambda: CustomTopo() ) }
+# this will be used for running on command line, unblock it for submit.py                    
+# topos = { 'custom': ( lambda: CustomTopo() ) }
