@@ -132,9 +132,70 @@ c1 = {'a1' : {'e1':{}, 'e2':{}}}
 print c1['a1']
 ```
 
-This will produce `{'e1': {}, 'e2': {}}`.
- 
+This will produce `{'e1': {}, 'e2': {}}`. more about [Python dictionaries](http://zetcode.com/lang/python/dictionaries/)
+
+## different approach for class home work
+
+prefix of layer pfx=[c, a, e, ..., h]+ %n
+fanout = 2		#[2, 2, 2]
+linkopts = {1:{}, 2:{}, 3:{}}
+map(start-node, if next-layer <> last-layer make-switch else make-host, connect start-fo node, loop fo)
+return
+
 ### lambda
+
+```
+t = map(lambda x: x**2, range(5))
+
+print t
+```
+
+This will print out `[0, 1, 4, 9, 16]` which is equivilant to below. There are some good discussion on [stackoverflow](http://stackoverflow.com/questions/10973766/understanding-the-map-function-python) and [this](http://stackoverflow.com/questions/672172/how-to-use-python-map-and-other-functional-tools)
+
+```
+def f(i): return i**2
+    
+t = map(f, range(5))
+
+print t
+```
+
+Continue evolving,
+
+```
+pfx = ['c', 'a', 'e', 'h']
+fo = [1, 2, 2, 2]
+lo = ['l0', 'l1', 'l2', 'l3']
+
+def f(x, y, z):     
+    return (x, y, z) 	# return node and link later
+    
+t = map(f, pfx, fo, lo)
+
+print t 
+```
+
+This will produce
+`[('c', 1, 'l0'), ('a', 2, 'l1'), ('e', 2, 'l2'), ('h', 2, 'l3')]`
+
+Continue, need to understand [nested looping](http://stackoverflow.com/questions/17006641/single-line-nested-for-loops) more,
+
+Try to learn imap from [introduction to itertools](http://jmduke.com/posts/a-gentle-introduction-to-itertools/)
+
+```
+from itertools import imap
+
+l =list(imap( pow, (2,3,10), (5,2,3)))
+print l
+```
+
+produces `[32, 9, 1000]`. This is good, let different functions with more parameters. pow is build function. 
+
+
+
+
+
+
 
 
 
