@@ -23,7 +23,6 @@ import os
 
 log = core.getLogger()
 
-
 class TopologySlice (EventMixin):
 
     def __init__(self):
@@ -40,46 +39,84 @@ class TopologySlice (EventMixin):
         log.debug("Switch %s has come up.", dpid)
         
         """ Add your logic here """
-        matchRule = of.ofp_match()
-        fm = of.ofp_flow_mod()          # flow modification messagr
-            
-        if dpid == 1:       # s1
+        match_rule = of.ofp_match()
+        flow_msg = of.ofp_flow_mod()        # flow messagr for modification
+
+        """ 
+        # option-1 use src/dst Mac addresses to do matching, but in_port is easier
+        # option-2 simplify the code later with this function
+        def getFlowMsg(dpid, in_port, out_port):
             log.debug("Setting rules for switch %d", dpid)
-            matchRule.dl_src = EthAddr('00:00:00:00:00:03')     #s1 <- s3
-            matchRule.dl_dst = EthAddr('00:00:00:00:00:01')     #s1
-            fm.match = matchRule
-            fm.actions.append(of.ofp_action_output(port = 1))
-            event.connection.send(fm)
 
-            matchRule.dl_src = EthAddr('00:00:00:00:00:01')     #s1 -> s3
-            matchRule.dl_dst = EthAddr('00:00:00:00:00:03')     #s3
-            fm.match = matchRule
-            fm.actions.append(of.ofp_action_output(port = 3))
-            event.connection.send(fm)
+            msg = of.ofp_flow_mod()    # flow messagr for modification
+            msg.match.in_port = in_port
+            msg.actions.append(of.ofp_action_output(port = out_port))
 
-            """  different approach
-            input_port = 1                      # -> s
-            output_port = 3                     # s ->
-            fm.match.input_port = input_port
-            fm.match.output_port = output_port
-            fm.actions.append(of.ofp_action_output(port = output_port))
-            event.connection.send(fm)
+            return msg      
+            # this is equivalent to fm_s1s4p13, ... below, may not needed
 
-            input_port = 3                      # -> s
-            output_port = 1                     # s ->
-            fm.match.input_port = input_port
-            fm.match.output_port = output_port
-            fm.actions.append(of.ofp_action_output(port = output_port))
-            event.connection.send(fm)
-            """
+        # Use
+        event.connection.send(getFlowMsg(1, 1, 3))
+        event.connection.send(getFlowMsg(1, 3, 1))
+        """
+            
+        if dpid == 1 or dpid == 4:          # s1 or s4
+            log.debug("Setting rules for switch %d", dpid)
+
+            # upper flow
+            in_port = 1                     # -> s
+            out_port = 3                    # s ->
+
+            fm_s1s4p13 = of.ofp_flow_mod()  # flow messagr for modification
+            fm_s1s4p13.match.in_port = in_port
+            fm_s1s4p13.actions.append(of.ofp_action_output(port = out_port))
+            event.connection.send(fm_s1s4p13)
+
+            in_port = 3                     # -> s
+            out_port = 1                    # s ->
+
+            fm_s1s4p31 = of.ofp_flow_mod()  # flow messagr for modification
+            fm_s1s4p31.match.in_port = in_port
+            fm_s1s4p31.actions.append(of.ofp_action_output(port = out_port))
+            event.connection.send(fm_s1s4p31)
+
+
+            # upper flow
+            in_port = 2                     # -> s
+            out_port = 4                    # s ->
+
+            fm_s1s4p24 = of.ofp_flow_mod()  # flow messagr for modification
+            fm_s1s4p24.match.in_port = in_port
+            fm_s1s4p24.actions.append(of.ofp_action_output(port = out_port))
+            event.connection.send(fm_s1s4p24)
+
+            in_port = 4                     # -> s
+            out_port = 2                    # s ->
+
+            fm_s1s4p42 = of.ofp_flow_mod()  # flow messagr for modification
+            fm_s1s4p42.match.in_port = in_port
+            fm_s1s4p42.actions.append(of.ofp_action_output(port = out_port))
+            event.connection.send(fm_s1s4p42)
+
+         # elif dpid == '00-00-00-00-00-02' or dpid == '00-00-00-00-00-03':
+         elif dpid == 2 or dpid == 3:       # s2 or s3
+            
+            in_port = 1
+            out_port = 2
+            
+            fm_s2s3p12 = of.ofp_flow_mod()
+            fm_s2s3p12.match.in_port = in_port
+            fm_s2s3p12.actions.append(of.ofp_action_output(port=out_port))
+            event.connection.send(fm_s2s3p12)
+            
+            in_port = 2
+            out_port = 1
+            
+            fm_s2s3p21 = of.ofp_flow_mod()
+            fm_s2s3p21.match.in_port = in_port
+            fm_s2s3p21.actions.append(of.ofp_action_output(port=out_port))
+            event.connection.send(fm_s2s3p21)
         
-        if dpid == 4:       # s4
-            pass
-        if dpid == 2:       # s2
-            pass
-        if dpid == 3:       # s3
-            pass
-
 def launch():
     # Run spanning tree so that we can deal with topologies with loops
     pox.openflow.discovery.launch()
