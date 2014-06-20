@@ -46,78 +46,47 @@ class TopologySlice (EventMixin):
         # option-1 use src/dst Mac addresses to do matching, but in_port is easier
             forwardRule.dl_src = EthAddr("00:00:00:00:00:01")
             forwardRule.dl_dst = EthAddr("00:00:00:00:00:03")
+        """
        
         # option-2 simplify the code later with this function
-        def getFlowMsg(dpid, in_port, out_port):
-            log.debug("Setting rules for switch %d", dpid)
-
+        def getFlowMsg(in_port, out_port):
             msg = of.ofp_flow_mod()    # flow messagr for modification
             msg.match.in_port = in_port
             msg.actions.append(of.ofp_action_output(port = out_port))
 
-            return msg      
+            return msg     
             # this is equivalent to fm_s1s4p13, ... below, may not needed
 
-        # Use
-            event.connection.send(getFlowMsg(1, 1, 3))
-            event.connection.send(getFlowMsg(1, 3, 1))
-        """
-            
         if dpid == '00-00-00-00-00-01' or dpid == '00-00-00-00-00-04':
             log.debug("Setting rules for switch %d", dpid)
 
             # upper flow
             in_port = 1                     
             out_port = 3                    
-
-            fm_s1s4p13 = of.ofp_flow_mod()  
-            fm_s1s4p13.match.in_port = in_port
-            fm_s1s4p13.actions.append(of.ofp_action_output(port = out_port))
-            event.connection.send(fm_s1s4p13)
+            event.connection.send(getFlowMsg(in_port, out_port))
 
             in_port = 3                     
             out_port = 1                    
-
-            fm_s1s4p31 = of.ofp_flow_mod()  
-            fm_s1s4p31.match.in_port = in_port
-            fm_s1s4p31.actions.append(of.ofp_action_output(port = out_port))
-            event.connection.send(fm_s1s4p31)
-
+            event.connection.send(getFlowMsg(in_port, out_port))
 
             # upper flow
             in_port = 2                     
             out_port = 4                    
-
-            fm_s1s4p24 = of.ofp_flow_mod()  
-            fm_s1s4p24.match.in_port = in_port
-            fm_s1s4p24.actions.append(of.ofp_action_output(port = out_port))
-            event.connection.send(fm_s1s4p24)
+            event.connection.send(getFlowMsg(in_port, out_port))
 
             in_port = 4                    
             out_port = 2                   
-
-            fm_s1s4p42 = of.ofp_flow_mod()  
-            fm_s1s4p42.match.in_port = in_port
-            fm_s1s4p42.actions.append(of.ofp_action_output(port = out_port))
-            event.connection.send(fm_s1s4p42)
+            event.connection.send(getFlowMsg(in_port, out_port))
 
         elif dpid == '00-00-00-00-00-02' or dpid == '00-00-00-00-00-03':
             
             in_port = 1
-            out_port = 2
-            
-            fm_s2s3p12 = of.ofp_flow_mod()
-            fm_s2s3p12.match.in_port = in_port
-            fm_s2s3p12.actions.append(of.ofp_action_output(port=out_port))
-            event.connection.send(fm_s2s3p12)
+            out_port = 2            
+            event.connection.send(getFlowMsg(in_port, out_port))
             
             in_port = 2
             out_port = 1
-            
-            fm_s2s3p21 = of.ofp_flow_mod()
-            fm_s2s3p21.match.in_port = in_port
-            fm_s2s3p21.actions.append(of.ofp_action_output(port=out_port))
-            event.connection.send(fm_s2s3p21)
+            event.connection.send(getFlowMsg(in_port, out_port))
 
 """ delete this testing code between marks """
 def test():
