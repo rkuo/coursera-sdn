@@ -61,32 +61,16 @@ class TopologySlice (EventMixin):
             log.debug("Setting rules for switch %d", dpid)
 
             # upper flow
-            in_port = 1                     
-            out_port = 3                    
-            event.connection.send(getFlowMsg(in_port, out_port))
-
-            in_port = 3                     
-            out_port = 1                    
-            event.connection.send(getFlowMsg(in_port, out_port))
+            event.connection.send(getFlowMsg(1, 3))
+            event.connection.send(getFlowMsg(3, 1))
 
             # upper flow
-            in_port = 2                     
-            out_port = 4                    
-            event.connection.send(getFlowMsg(in_port, out_port))
-
-            in_port = 4                    
-            out_port = 2                   
-            event.connection.send(getFlowMsg(in_port, out_port))
+            event.connection.send(getFlowMsg(2, 4))
+            event.connection.send(getFlowMsg(4, 2))
 
         elif dpid == '00-00-00-00-00-02' or dpid == '00-00-00-00-00-03':
-            
-            in_port = 1
-            out_port = 2            
-            event.connection.send(getFlowMsg(in_port, out_port))
-            
-            in_port = 2
-            out_port = 1
-            event.connection.send(getFlowMsg(in_port, out_port))
+            event.connection.send(getFlowMsg(1, 2))
+            event.connection.send(getFlowMsg(2, 1))
 
 """ delete this testing code between marks """
 def test():
